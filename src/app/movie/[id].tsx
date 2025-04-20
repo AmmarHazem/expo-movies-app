@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 
 const MovieScreen: FC = () => {
   return (
-    <View>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Text>MovieScreen</Text>
     </View>
   );
