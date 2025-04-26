@@ -1,12 +1,23 @@
-import { Link } from "expo-router";
+import { icons } from "@/constants/icons";
+import { images } from "@/constants/images";
 import { FC } from "react";
-import { Text, View } from "react-native";
+import { Image, ScrollView, View } from "react-native";
+import SearchBar from "@/src/component/SearchBar";
 
 const HomeScreen: FC = () => {
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>HomeScreen</Text>
-      <Link href={"/movie/batman"}>Movie Details</Link>
+    <View className="flex-1 bg-primary">
+      <Image source={images.bg} className="absolute w-full z-0 top-0" />
+      <ScrollView
+        className="flex-1 px-4"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
+      >
+        <Image source={icons.logo} className="w-12 h-10 mt-20 mb-4 mx-auto" />
+        <View className="flex-1">
+          <SearchBar />
+        </View>
+      </ScrollView>
     </View>
   );
 };
