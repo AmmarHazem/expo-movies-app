@@ -1,24 +1,37 @@
 import { SWRConfig } from "swr";
 import { Stack } from "expo-router";
-import "../global.css";
 import { AppState, AppStateStatus } from "react-native";
+import { useEffect, useState } from "react";
+import NetInfo from "@react-native-community/netinfo";
+import "../global.css";
 
 export default function RootLayout() {
+  const [isConnected, setIsConnected] = useState(true);
+  console.log("isConnected", isConnected);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected ?? false);
+    });
+    return () => unsubscribe();
+  }, []);
+
   return (
     <SWRConfig
       value={{
         provider: () => new Map(),
         isOnline() {
-          /* Customize the network state detector */
-          return true;
+          return isConnected;
         },
         isVisible() {
-          /* Customize the visibility state detector */
-          return true;
+          const value = AppState.currentState === "active";
+          console.log("isVisible", value);
+          return value;
         },
         initFocus(callback) {
           let appState = AppState.currentState;
           const onAppStateChange = (nextAppState: AppStateStatus) => {
+            console.log("initFocus onAppStateChange", appState, nextAppState);
             /* If it's resuming from background or inactive mode to active one */
             if (appState.match(/inactive|background/) && nextAppState === "active") {
               callback();
@@ -31,9 +44,15 @@ export default function RootLayout() {
             subscription.remove();
           };
         },
-        // initReconnect(callback) {
-        //   /* Register the listener with your state provider */
-        // },
+        initReconnect(callback) {
+          const unsubscribe = NetInfo.addEventListener((state) => {
+            console.log("initReconnect", state.isConnected);
+            if (state.isConnected) {
+              callback();
+            }
+          });
+          return unsubscribe;
+        },
       }}
     >
       <Stack>
