@@ -2,12 +2,12 @@ import { SWRConfig } from "swr";
 import { Stack } from "expo-router";
 import { AppState, AppStateStatus } from "react-native";
 import { useEffect, useState } from "react";
+import axios from "axios";
 import NetInfo from "@react-native-community/netinfo";
 import "../global.css";
 
 export default function RootLayout() {
   const [isConnected, setIsConnected] = useState(true);
-  console.log("isConnected", isConnected);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
@@ -19,6 +19,16 @@ export default function RootLayout() {
   return (
     <SWRConfig
       value={{
+        fetcher: async (resource) => {
+          const res = await axios.get(resource, {
+            baseURL: `https://api.themoviedb.org`,
+            headers: {
+              accept: "application/json",
+              Authorization: `Bearer ${process.env.EXPO_PUBLIC_API_KEY}`,
+            },
+          });
+          return res.data;
+        },
         provider: () => new Map(),
         isOnline() {
           return isConnected;
@@ -46,7 +56,6 @@ export default function RootLayout() {
         },
         initReconnect(callback) {
           const unsubscribe = NetInfo.addEventListener((state) => {
-            console.log("initReconnect", state.isConnected);
             if (state.isConnected) {
               callback();
             }
