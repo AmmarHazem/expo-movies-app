@@ -4,9 +4,11 @@ import { FC } from "react";
 import { Image, ScrollView, View } from "react-native";
 import { useRouter } from "expo-router";
 import SearchBar from "@/src/component/SearchBar";
+import useDiscoverMovies from "@/src/hooks/useDiscoverMovies";
 
 const HomeScreen: FC = () => {
   const router = useRouter();
+  useDiscoverMovies();
 
   return (
     <View className="flex-1 bg-primary">
