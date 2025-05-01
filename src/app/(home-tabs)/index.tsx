@@ -20,7 +20,6 @@ const HomeScreen: FC = () => {
         // contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
       >
         <Image source={icons.logo} className="w-12 h-10 mt-20 mb-4 mx-auto" />
-
         {isLoading ? (
           <ActivityIndicator className="mt-10 self-center" size={'large'} color={'#0000FF'} />
         ) : error ? (
@@ -33,7 +32,7 @@ const HomeScreen: FC = () => {
               data={discoverMoviesResponse?.results ?? []}
               keyExtractor={(item) => item.id?.toString() ?? ''}
               numColumns={3}
-              columnWrapperStyle={{ gap: 20 }}
+              columnWrapperStyle={{ gap: 20, justifyContent: 'center', marginVertical: 16 }}
               contentContainerStyle={{ paddingBottom: 100 }}
               renderItem={({ item }) => {
                 return <MovieCard movie={item} />
