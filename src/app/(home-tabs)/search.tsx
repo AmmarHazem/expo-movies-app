@@ -1,18 +1,29 @@
 import { images } from '@/constants/images'
 import { ActivityIndicator, FlatList, Image, Text, TextInput, View } from 'react-native'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { icons } from '@/constants/icons'
 import useDiscoverMovies from '@/src/hooks/useDiscoverMovies'
 import MovieCard from '@/src/component/MovieCard'
 
 export default function SearchScreen() {
   const [searchText, setSearchText] = useState('')
+  const [debouncedSearchText, setDebouncedSearchText] = useState(searchText)
+  console.log('debouncedSearchText', debouncedSearchText)
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearchText(searchText)
+    }, 1000)
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [searchText])
 
   const {
     data: discoverMoviesResponse,
     isLoading,
     error,
-  } = useDiscoverMovies({ searchQuery: searchText })
+  } = useDiscoverMovies({ searchQuery: debouncedSearchText })
 
   return (
     <View className="bg-primary w-full flex-1 justify-center items-center">
