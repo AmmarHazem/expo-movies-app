@@ -1,7 +1,7 @@
 import { icons } from '@/constants/icons'
 import { images } from '@/constants/images'
 import { FC } from 'react'
-import { ActivityIndicator, FlatList, Image, ScrollView, Text, View } from 'react-native'
+import { ActivityIndicator, FlatList, Image, Text, View } from 'react-native'
 import { useRouter } from 'expo-router'
 import SearchBar from '@/src/component/SearchBar'
 import useDiscoverMovies from '@/src/hooks/useDiscoverMovies'
@@ -27,8 +27,12 @@ const HomeScreen: FC = () => {
         ) : (
           <>
             <SearchBar onPress={() => router.push('/search')} placeholder="Search for a movie" />
-            <Text className="text-lg text-white font-bold mt-5 mb-3">Latest Movies</Text>
             <FlatList
+              ListHeaderComponent={
+                <>
+                  <Text className="text-lg text-white font-bold mt-5 mb-3">Latest Movies</Text>
+                </>
+              }
               data={discoverMoviesResponse?.results ?? []}
               keyExtractor={(item) => item.id?.toString() ?? ''}
               numColumns={3}
