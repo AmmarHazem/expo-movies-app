@@ -1,5 +1,5 @@
 import { images } from '@/constants/images'
-import { FlatList, Image, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, FlatList, Image, Text, TextInput, View } from 'react-native'
 import { useState } from 'react'
 import { icons } from '@/constants/icons'
 import useDiscoverMovies from '@/src/hooks/useDiscoverMovies'
@@ -50,6 +50,15 @@ export default function SearchScreen() {
                 onChange={(e) => setSearchText(e.nativeEvent.text)}
               />
             </View>
+            {isLoading && <ActivityIndicator className="my-4" size={'large'} color={'#0000FF'} />}
+            {error && (
+              <Text className="text-white w-full text-center my-4">Something went wrong</Text>
+            )}
+            {searchText.length > 0 && discoverMoviesResponse?.results?.length === 0 && (
+              <Text className="text-white font-semibold w-full text-center my-8">
+                No results for {searchText}
+              </Text>
+            )}
           </>
         }
       />
