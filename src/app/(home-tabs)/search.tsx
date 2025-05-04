@@ -8,7 +8,10 @@ import MovieCard from '@/src/component/MovieCard'
 export default function SearchScreen() {
   const [searchText, setSearchText] = useState('')
   const [debouncedSearchText, setDebouncedSearchText] = useState(searchText)
-  console.log('debouncedSearchText', debouncedSearchText)
+
+  useEffect(() => {
+    console.log('debouncedSearchText', debouncedSearchText)
+  }, [debouncedSearchText])
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -58,6 +61,8 @@ export default function SearchScreen() {
                 autoFocus={true}
                 placeholderTextColor={'white'}
                 value={searchText}
+                clearButtonMode="while-editing"
+                keyboardType="web-search"
                 onChange={(e) => setSearchText(e.nativeEvent.text)}
               />
             </View>
@@ -65,11 +70,13 @@ export default function SearchScreen() {
             {error && (
               <Text className="text-white w-full text-center my-4">Something went wrong</Text>
             )}
-            {searchText.length > 0 && discoverMoviesResponse?.results?.length === 0 && (
-              <Text className="text-white font-semibold w-full text-center my-8">
-                No results for {searchText}
-              </Text>
-            )}
+          </>
+        }
+        ListEmptyComponent={
+          <>
+            <Text className="text-white font-semibold w-full text-center my-8">
+              No results for {searchText}
+            </Text>
           </>
         }
       />
