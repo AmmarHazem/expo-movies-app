@@ -2,15 +2,24 @@ import useSWR from 'swr'
 import { MoviesAPIResponseModel } from '../models/MoviesAPIResponseModel'
 import { useMemo } from 'react'
 
-export default function useDiscoverMovies({ searchQuery }: { searchQuery?: string }) {
+export default function useDiscoverMovies({
+  searchQuery,
+  searchParams: searchParamsParam,
+}: {
+  searchQuery?: string
+  searchParams?: URLSearchParams
+}) {
   const url = useMemo(() => {
     if (searchQuery) {
       return `/3/search/movie?query=${searchQuery}`
     }
-    const searchParams = new URLSearchParams()
-    searchParams.set('sort_by', 'popularity.desc')
+
+    const searchParams = searchParamsParam ?? new URLSearchParams()
+    if (!searchParamsParam) {
+      searchParams.set('sort_by', 'popularity.desc')
+    }
     return `/3/discover/movie?${searchParams.toString()}`
-  }, [searchQuery])
+  }, [searchQuery, searchParamsParam])
 
   const { data, error, isLoading } = useSWR<MoviesAPIResponseModel>(url)
 
