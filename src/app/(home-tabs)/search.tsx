@@ -1,6 +1,6 @@
 import { images } from '@/constants/images'
 import { ActivityIndicator, FlatList, Image, Text, TextInput, View } from 'react-native'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { icons } from '@/constants/icons'
 import useDiscoverMovies from '@/src/hooks/useDiscoverMovies'
 import MovieCard from '@/src/component/MovieCard'
@@ -22,11 +22,32 @@ export default function SearchScreen() {
     }
   }, [searchText])
 
+  const moviesSearchParams = useMemo(() => {
+    const value = new URLSearchParams()
+    value.set('sort_by', 'vote_average.desc')
+    return value
+  }, [])
+
   const {
     data: discoverMoviesResponse,
     isLoading,
     error,
-  } = useDiscoverMovies({ searchQuery: debouncedSearchText })
+  } = useDiscoverMovies({ searchQuery: debouncedSearchText, searchParams: moviesSearchParams })
+
+  const {
+    data: popularMovies,
+    isLoading: popularMoviesLoading,
+    error: popularMoviesError,
+  } = useDiscoverMovies({})
+
+  const listViews = useMemo<{ key: string; view: JSX.Element }[]>(() => {
+    const moviesList = discoverMoviesResponse?.results ?? []
+    return [
+      ...moviesList.map<{ key: string; view: JSX.Element }>((movie) => {
+        return { key: movie.id?.toString() ?? '', view: <MovieCard movie={movie} width={'45%'} /> }
+      }),
+    ]
+  }, [discoverMoviesResponse?.results])
 
   return (
     <View className="bg-primary w-full flex-1 justify-center items-center">
@@ -36,14 +57,14 @@ export default function SearchScreen() {
         className="flex-1 absolute top-0 left-0 right-0 z-0"
       />
       <FlatList
-        data={discoverMoviesResponse?.results ?? []}
-        keyExtractor={(item) => item.id?.toString() ?? ''}
+        data={listViews}
+        keyExtractor={(item) => item.key}
         numColumns={2}
         columnWrapperStyle={{ gap: 20, justifyContent: 'center', marginVertical: 16 }}
         contentContainerStyle={{ paddingBottom: 100, width: '100%' }}
         style={{ width: '100%' }}
         renderItem={({ item }) => {
-          return <MovieCard movie={item} width={'45%'} />
+          return item.view
         }}
         ListHeaderComponent={
           <>
@@ -66,6 +87,39 @@ export default function SearchScreen() {
                 onChange={(e) => setSearchText(e.nativeEvent.text)}
               />
             </View>
+            <FlatList
+              data={popularMovies?.results ?? []}
+              keyExtractor={(item) => item.id?.toString() ?? ''}
+              horizontal={true}
+              showsHorizontalScrollIndicator={true}
+              // ItemSeparatorComponent={() => <View className="w-2 h-10 bg-red-700" />}
+              contentContainerStyle={{
+                gap: 20,
+                paddingHorizontal: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              renderItem={({ item, index }) => {
+                return (
+                  <View style={{ position: 'relative' }}>
+                    <Text
+                      style={{
+                        position: 'absolute',
+                        bottom: 50,
+                        left: -10,
+                        zIndex: 10,
+                        fontSize: 50,
+                        color: 'white',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {index + 1}
+                    </Text>
+                    <MovieCard movie={item} width={200} />
+                  </View>
+                )
+              }}
+            />
             {isLoading && <ActivityIndicator className="my-4" size={'large'} color={'#0000FF'} />}
             {error && (
               <Text className="text-white w-full text-center my-4">Something went wrong</Text>
