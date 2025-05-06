@@ -67,7 +67,10 @@ export default function RootLayout() {
       <StatusBar barStyle="light-content" hidden={false} />
       <Stack>
         <Stack.Screen name="(home-tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="movie/[id]" options={{ headerShown: true }} />
+        <Stack.Screen
+          name="movie/[id]"
+          options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', title: '' }}
+        />
       </Stack>
     </SWRConfig>
   )
