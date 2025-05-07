@@ -1,19 +1,9 @@
 import useMovieDetails from '@/src/hooks/useMovieDetails'
 import { useLocalSearchParams, useNavigation } from 'expo-router'
-import { FC, useLayoutEffect } from 'react'
-import {
-  ActivityIndicator,
-  Image,
-  View,
-  Text,
-  TouchableOpacity,
-  ImageBackground,
-  StyleSheet,
-  Dimensions,
-} from 'react-native'
-import { BlurView } from 'expo-blur'
-
-const { width } = Dimensions.get('window')
+import { FC, useLayoutEffect, useMemo } from 'react'
+import { Text, ActivityIndicator, Image, Pressable, View, ScrollView } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
+import { icons } from '@/constants/icons'
 
 const MovieScreen: FC = () => {
   const navigation = useNavigation()
@@ -24,92 +14,63 @@ const MovieScreen: FC = () => {
     navigation.setOptions({ title: data?.title ?? '' })
   }, [data?.title])
 
+  const overviewText = useMemo(() => {
+    const text = data?.overview ?? ''
+    const limit = 200
+    if (text.length > limit) {
+      return text.slice(0, limit) + '...'
+    }
+    return text
+  }, [data?.overview])
+
   if (isLoading || !data) {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size={'large'} style={{ marginVertical: 10 }} />
       </View>
     )
   }
 
-  const posterUrl = data.poster_path
-    ? `https://image.tmdb.org/t/p/w500${data.poster_path}`
-    : undefined
-
   return (
-    <View style={{ flex: 1 }}>
+    <ScrollView style={{ flex: 1 }}>
       {/* Top Section */}
-      <View style={{ height: 500 }}>
-        <ImageBackground
-          source={posterUrl ? { uri: posterUrl } : undefined}
-          style={{ flex: 1, justifyContent: 'flex-end' }}
-          blurRadius={20}
-        >
-          <BlurView intensity={60} style={StyleSheet.absoluteFill} />
-          <View style={{ alignItems: 'center', marginBottom: 20 }}>
-            <Image
-              source={posterUrl ? { uri: posterUrl } : undefined}
-              style={{
-                width: width * 0.5,
-                height: width * 0.75,
-                borderRadius: 16,
-                marginBottom: 16,
-              }}
-              resizeMode="cover"
-            />
-            <Text style={{ color: '#fff', fontSize: 32, fontWeight: 'bold', textAlign: 'center' }}>
-              {data.title}
-            </Text>
-            <Text style={{ color: '#fff', fontSize: 16, marginVertical: 4 }}>
-              {data.release_date?.toString().slice(0, 4)} • {data.runtime} min
-            </Text>
-            <View style={{ flexDirection: 'row', marginVertical: 8 }}>
-              {data.genres?.map((g) => (
-                <Text key={g.id} style={{ color: '#fff', marginHorizontal: 4 }}>
-                  {g.name}
-                </Text>
-              ))}
-            </View>
-            <View style={{ flexDirection: 'row', marginVertical: 8 }}>
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>Buy AED 59.99</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, { backgroundColor: '#fff', marginLeft: 10 }]}
-              >
-                <Text style={[styles.buttonText, { color: '#000' }]}>Rent AED 21.99</Text>
-              </TouchableOpacity>
-            </View>
-            <Text
-              style={{
-                color: '#fff',
-                fontSize: 14,
-                marginTop: 8,
-                textAlign: 'center',
-                paddingHorizontal: 16,
-              }}
+      <View style={{ height: 500, position: 'relative' }}>
+        <Image
+          source={{ uri: `https://image.tmdb.org/t/p/w500${data.poster_path}` }}
+          className="w-full h-[80%]"
+          resizeMode="cover"
+        />
+        <LinearGradient
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
+          colors={['black', 'transparent']}
+          start={{ x: 0.5, y: 1 }}
+          end={{ x: 0.5, y: 0.5 }}
+          locations={[0.4, 1]}
+        />
+        <View className="flex-1 z-20 justify-end p-4 absolute inset-0">
+          <View className="flex-row items-center justify-between gap-4">
+            <Pressable
+              className="bg-white rounded-lg px-4 py-4 flex-1"
+              onPress={() => navigation.goBack()}
             >
-              {data.overview}
-            </Text>
+              <Text className="font-semibold text-center">Buy AED 59.5</Text>
+            </Pressable>
+            <Pressable
+              className="bg-white rounded-lg px-4 py-4 flex-1"
+              onPress={() => navigation.goBack()}
+            >
+              <Text className="font-semibold text-center">Rent AED 29.5</Text>
+            </Pressable>
           </View>
-        </ImageBackground>
+          <Text className="text-white mt-4">{overviewText}</Text>
+          <View className="flex-row mt-4 items-center">
+            <Image source={icons.star} className="size-4 me-1" />
+            <Text className="text-white font-semibold">{Math.round(data.vote_average ?? 0)}</Text>
+          </View>
+        </View>
       </View>
-      {/* ...rest of your screen... */}
-    </View>
+    </ScrollView>
   )
 }
-
-const styles = StyleSheet.create({
-  button: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-})
 
 export default MovieScreen
