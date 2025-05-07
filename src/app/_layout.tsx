@@ -69,7 +69,18 @@ export default function RootLayout() {
         <Stack.Screen name="(home-tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="movie/[id]"
-          options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', title: '' }}
+          options={{
+            headerShown: true,
+            headerBackButtonDisplayMode: 'minimal',
+            title: '',
+            headerBlurEffect: 'light',
+            headerStyle: {
+              backgroundColor: 'transparent',
+            },
+            headerTransparent: true,
+            // headerTintColor: 'white',
+            headerLargeTitle: false,
+          }}
         />
       </Stack>
     </SWRConfig>
